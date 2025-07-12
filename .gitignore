@@ -13,7 +13,6 @@ logs/
 *.db
 *.bin
 *.key
-*.txt
 
 # Environment variables
 .env
