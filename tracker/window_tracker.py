@@ -7,10 +7,10 @@ import time
 import win32gui
 import win32process
 import psutil
+import logger
 from storage.db import log_activity
-import logging
 
-logger = logging.getLogger("window_tracker")
+logger = logger.getLogger("WINDOW")
 
 def get_active_window() -> tuple[str, str]:
     """Return the current active window's process name and title."""

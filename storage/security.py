@@ -5,12 +5,12 @@ Handles encryption and storage of sensitive credentials.
 
 from cryptography.fernet import Fernet
 import os
+import logger
 from datetime import datetime
-import logging
 
 key_file = "logs/fernet.key"
 cred_file = "logs/creds.bin"
-logger = logging.getLogger("security")
+logger = logger.getLogger("SECURITY")
 
 cipher = None
 

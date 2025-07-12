@@ -6,14 +6,14 @@ Generates a daily productivity summary using OpenAI GPT.
 import openai
 import sqlite3
 import os
+import logger
 from datetime import datetime
 from dotenv import load_dotenv
-import logging
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-logger = logging.getLogger("summarizer")
+logger = logger.getLogger("SUMMARY")
 
 def summarize_day() -> None:
     """Generate and log a daily summary of user activity using OpenAI GPT."""

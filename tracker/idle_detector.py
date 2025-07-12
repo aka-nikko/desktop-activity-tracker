@@ -4,11 +4,11 @@ Logs user inactivity and triggers events based on idle time.
 """
 
 import time
-import logging
+import logger
 from pynput import keyboard, mouse
 from storage.db import log_idle
 
-logger = logging.getLogger("idle_detector")
+logger = logger.getLogger("IDLE")
 last_input_time = time.time()
 
 def on_input(_: object) -> None:

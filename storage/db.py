@@ -5,12 +5,12 @@ Handles activity, keystroke, and idle event logging.
 
 import sqlite3
 import os
+import logger
 from datetime import datetime
-import logging
 
 os.makedirs("logs", exist_ok=True)
 db_path = "logs/activityDatabase.db"
-logger = logging.getLogger("db")
+logger = logger.getLogger("DB")
 
 def init_db() -> None:
     """Initialize the SQLite database and tables if not present."""
