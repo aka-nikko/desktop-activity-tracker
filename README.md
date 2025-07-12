@@ -93,6 +93,14 @@ python main.py
 
 ---
 
+## Screenshots
+### Logging
+![Logging](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/logging.png)
+### Summary
+![Summary](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/gpt-summary.png)
+
+---
+
 ## Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
