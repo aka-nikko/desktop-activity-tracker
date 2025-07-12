@@ -10,6 +10,7 @@ import psutil
 import logger
 from storage.db import log_activity
 
+# Initialize logger for window tracking
 logger = logger.getLogger("WINDOW")
 
 def get_active_window() -> tuple[str, str]:

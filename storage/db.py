@@ -8,9 +8,12 @@ import os
 import logger
 from datetime import datetime
 
+# Initialize logger for database operations
+logger = logger.getLogger("DB")
+
+# Ensure logs directory exists
 os.makedirs("logs", exist_ok=True)
 db_path = "logs/activityDatabase.db"
-logger = logger.getLogger("DB")
 
 def init_db() -> None:
     """Initialize the SQLite database and tables if not present."""
@@ -20,8 +23,6 @@ def init_db() -> None:
         c.execute("CREATE TABLE IF NOT EXISTS keystrokes (timestamp TEXT, key TEXT)")
         c.execute("CREATE TABLE IF NOT EXISTS idle (timestamp TEXT, duration REAL)")
         conn.commit()
-
-init_db()
 
 def log_activity(app: str, title: str, duration: float) -> None:
     """Log an application window activity event."""
@@ -65,3 +66,6 @@ def log_idle(duration: float) -> None:
         logger.info(f"Idle event logged: {duration:.0f}s")
     except Exception as e:
         logger.error(f"Failed to log idle: {e}")
+
+# Initialize the database
+init_db()

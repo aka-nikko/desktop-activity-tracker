@@ -8,10 +8,14 @@ import os
 import logger
 from datetime import datetime
 
-key_file = "logs/fernet.key"
-cred_file = "logs/creds.bin"
+# Initialize logger for security operations
 logger = logger.getLogger("SECURITY")
 
+# Define file paths for key and credentials
+key_file = "logs/fernet.key"
+cred_file = "logs/creds.bin"
+
+# Global variable for the Fernet cipher
 cipher = None
 
 def generate_key() -> None:
@@ -20,6 +24,7 @@ def generate_key() -> None:
     key = Fernet.generate_key()
     with open(key_file, "wb") as f:
         f.write(key)
+        logger.info("Generated and stored new Fernet key.")
 
 def setup_security():
     """Initialize encryption key and cipher."""

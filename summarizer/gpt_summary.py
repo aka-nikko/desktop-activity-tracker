@@ -6,14 +6,51 @@ Generates a daily productivity summary using OpenAI GPT.
 import openai
 import sqlite3
 import os
+import time
 import logger
 from datetime import datetime
+from pynput import keyboard as pynput_keyboard
 from dotenv import load_dotenv
 
+# Initialize logger for summarization
+logger = logger.getLogger("SUMMARY")
+
+# Load environment variables
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-logger = logger.getLogger("SUMMARY")
+def _summary_hotkey_callback() -> None:
+    """Callback for manual summary generation via hotkey."""
+    logger.info("Generating daily summary via hotkey.")
+    summarize_day()
+
+def listen_for_summary_trigger() -> None:
+    """Listen for Ctrl+Shift+S to trigger summary generation."""
+    logger.info("Press Ctrl+Shift+S anytime to generate summary.")
+
+    hotkey = pynput_keyboard.HotKey(
+        pynput_keyboard.HotKey.parse('<ctrl>+<shift>+s'),
+        lambda: _summary_hotkey_callback()
+    )
+
+    def for_canonical(f):
+        return lambda k: f(l.canonical(k))
+
+    with pynput_keyboard.Listener(
+        on_press=for_canonical(hotkey.press),
+        on_release=for_canonical(hotkey.release)
+    ) as l:
+        l.join()
+
+def schedule_nightly_summary() -> None:
+    """Automatically generate summary at 23:59 each day."""
+    while True:
+        now = time.localtime()
+        if now.tm_hour == 23 and now.tm_min == 59:
+            logger.info("Generating nightly summary at 23:59.")
+            summarize_day()
+            time.sleep(60)
+        time.sleep(10)
 
 def summarize_day() -> None:
     """Generate and log a daily summary of user activity using OpenAI GPT."""

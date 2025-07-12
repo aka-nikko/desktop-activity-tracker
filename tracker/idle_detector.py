@@ -8,7 +8,10 @@ import logger
 from pynput import keyboard, mouse
 from storage.db import log_idle
 
+# Initialize logger for idle detection
 logger = logger.getLogger("IDLE")
+
+# Global variable to track last input time
 last_input_time = time.time()
 
 def on_input(_: object) -> None:
