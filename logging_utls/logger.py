@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 
 # Create logs directory if it doesn't exist
-LOG_DIR = os.path.join(os.path.dirname(__file__), 'logs')
+LOG_DIR = 'logs'
 os.makedirs(LOG_DIR, exist_ok=True)
 
 # Global logger instance

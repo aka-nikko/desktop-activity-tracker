@@ -15,7 +15,7 @@ def get_logger():
     """Get the main logger instance, initializing it if necessary."""
     global main_logger
     if main_logger is None:
-        from logger import init_logger
+        from logging_utls.logger import init_logger
         main_logger = init_logger("WINDOW")
     return main_logger
 
