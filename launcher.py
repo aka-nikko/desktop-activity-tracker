@@ -42,7 +42,7 @@ class TrayApp:
         """Set up the tray icon and its menu."""
         icon = Icon("ActivityTracker")
         try:
-            icon.icon = Image.open("assets/icon.png")
+            icon.icon = Image.open("assets/icon.ico")
         except Exception as e:
             get_logger().error(f"Failed to load tray icon: {e}")
             icon.icon = None  # Fallback to default icon
