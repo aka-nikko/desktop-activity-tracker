@@ -49,6 +49,10 @@ A privacy-conscious productivity tracker for Windows that logs app usage, keystr
     OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     ```
 
+5. **Configure app settings:**
+
+    Edit config/settings.json to customize log paths, summary time, batch size, and GPT model. See the Configuration section for details.
+
 ---
 
 ## Usage
@@ -73,6 +77,24 @@ python launcher.py
 - Clean, minimal UI for quick access and control.
 
 ---
+
+## Configuration
+All runtime settings are stored in a settings.json file. Below is a description of each key:
+| Key                  | Description                                                                                                            |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `LOG_DIR`            | Directory where log files are stored.                                                                                  |
+| `DB_PATH`            | Directory where the SQLite database is located.                                                                        |
+| `DB_FILE`            | Name of the SQLite database file that stores activity data.                                                            |
+| `FERNET_KEY_PATH`    | Directory containing the encryption key used for secure data (Fernet).                                                 |
+| `CREDS_FILE_PATH`    | Path to files containing sensitive credentials (e.g., username, passwords).                                            |
+| `SENSITIVE_KEYWORDS` | List of keywords that are considered sensitive (e.g., login, password, auth). Used to mask or ignore certain activity. |
+| `BATCH_SIZE`         | Number of keystroke entries to collect before writing to the database.                                                 |
+| `FLUSH_INTERVAL`     | Interval in seconds to flush the collected activity data to the database.                                              |
+| `SUMMARY_TRIGGER`    | Hotkey combination to manually trigger activity summary. Example: `<ctrl>+<shift>+s`                                   |
+| `SUMMARY_HOUR`       | Hour (24-hour format) to automatically generate daily summary.                                                         |
+| `SUMMARY_MINUTE`     | Minute of the hour when the daily summary is triggered.                                                                |
+| `GPT_MODEL`          | OpenAI model used for summarization (e.g., `gpt-3.5-turbo`).                                                           |
+
 
 ## Project Structure
 
