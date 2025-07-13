@@ -131,12 +131,18 @@ All runtime settings are stored in a settings.json file. Below is a description 
 ---
 
 ## Screenshots
+### Desktop Activity Tracker
+<p float="left">
+  <img src="https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/desktop_activity_tracker.png" width="45%" title="Desktop Activity Tracker"/>&emsp;
+  <img src="https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/tracking.png" width="45%" title="Tracking"/>
+</p>
+
+### Tray UI
+![Tray_icon](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/tray_icon.png)
 ### Logging
 ![Logging](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/logging.png)
 ### Summary
 ![Summary](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/gpt-summary.png)
-### Tray UI
-![Tray_icon](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/tray_icon.png)
 
 ---
 
