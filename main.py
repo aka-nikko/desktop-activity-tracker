@@ -4,7 +4,6 @@ Initializes all background trackers and summary triggers.
 """
 
 import threading
-import logger
 from tracker.window_tracker import track_windows
 from tracker.keystroke_tracker import start_keystroke_logger
 from tracker.idle_detector import start_listeners, idle_watcher
@@ -13,10 +12,17 @@ from storage.security import setup_security
 from summarizer.gpt_summary import listen_for_summary_trigger, schedule_nightly_summary
 
 # Initialize logger
-logger = logger.getLogger("MAIN", is_main=True)
+main_logger = None
+def get_logger():
+    """Get the main logger instance, initializing it if necessary."""
+    global main_logger
+    if main_logger is None:
+        from logger import init_logger
+        main_logger = init_logger("MAIN", is_main=True)
+    return main_logger
 
 if __name__ == "__main__":
-    logger.info("Desktop Activity Tracker starting...")
+    get_logger().info("Desktop Activity Tracker starting...")
 
     # Setup security features
     setup_security()
@@ -31,4 +37,4 @@ if __name__ == "__main__":
         # Main window tracker (blocking)
         track_windows()
     except KeyboardInterrupt:
-        logger.info("Desktop Activity Tracker stopped by user.")
+        get_logger().info("Desktop Activity Tracker stopped by user.")

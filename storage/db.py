@@ -5,24 +5,34 @@ Handles activity, keystroke, and idle event logging.
 
 import sqlite3
 import os
-import logger
 from datetime import datetime
-
-# Initialize logger for database operations
-logger = logger.getLogger("DB")
 
 # Ensure logs directory exists
 os.makedirs("logs", exist_ok=True)
 db_path = "logs/activityDatabase.db"
 
+# Initialize logger for database operations
+main_logger = None
+def get_logger():
+    """Get the main logger instance, initializing it if necessary."""
+    global main_logger
+    if main_logger is None:
+        from logger import init_logger
+        main_logger = init_logger("DB")
+    return main_logger
+
 def init_db() -> None:
     """Initialize the SQLite database and tables if not present."""
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS activity (timestamp TEXT, app TEXT, title TEXT, duration REAL)")
-        c.execute("CREATE TABLE IF NOT EXISTS keystrokes (timestamp TEXT, key TEXT)")
-        c.execute("CREATE TABLE IF NOT EXISTS idle (timestamp TEXT, duration REAL)")
-        conn.commit()
+    try:
+        with sqlite3.connect(db_path) as conn:
+            c = conn.cursor()
+            c.execute("CREATE TABLE IF NOT EXISTS activity (timestamp TEXT, app TEXT, title TEXT, duration REAL)")
+            c.execute("CREATE TABLE IF NOT EXISTS keystrokes (timestamp TEXT, key TEXT)")
+            c.execute("CREATE TABLE IF NOT EXISTS idle (timestamp TEXT, duration REAL)")
+            conn.commit()
+        get_logger().info("Database initialized with activity, keystrokes, and idle tables.")
+    except Exception as e:
+        get_logger().error(f"Failed to initialize database: {e}")
 
 def log_activity(app: str, title: str, duration: float) -> None:
     """Log an application window activity event."""
@@ -30,9 +40,9 @@ def log_activity(app: str, title: str, duration: float) -> None:
         with sqlite3.connect(db_path) as conn:
             conn.execute("INSERT INTO activity VALUES (?, ?, ?, ?)", (datetime.now().isoformat(), app, title, duration))
             conn.commit()
-        logger.info(f"Activity logged: {app} - {title} ({duration:.2f}s)")
+        get_logger().info(f"Activity logged: {app} - {title} ({duration:.2f}s)")
     except Exception as e:
-        logger.error(f"Failed to log activity: {e}")
+        get_logger().error(f"Failed to log activity: {e}")
 
 def log_keystroke(key: str) -> None:
     """Log a single keystroke event."""
@@ -40,9 +50,9 @@ def log_keystroke(key: str) -> None:
         with sqlite3.connect(db_path) as conn:
             conn.execute("INSERT INTO keystrokes VALUES (?, ?)", (datetime.now().isoformat(), key))
             conn.commit()
-        logger.info(f"Keystroke logged: {key}")
+        get_logger().info(f"Keystroke logged: {key}")
     except Exception as e:
-        logger.error(f"Failed to log keystroke: {e}")
+        get_logger().error(f"Failed to log keystroke: {e}")
 
 def log_keystrokes_batch(keys: list[str]) -> None:
     """Batch log multiple keystrokes."""
@@ -53,9 +63,9 @@ def log_keystrokes_batch(keys: list[str]) -> None:
         with sqlite3.connect(db_path) as conn:
             conn.executemany("INSERT INTO keystrokes VALUES (?, ?)", [(now, k) for k in keys])
             conn.commit()
-        logger.info(f"Batch keystrokes logged: {len(keys)} keys")
+        get_logger().info(f"Batch keystrokes logged: {len(keys)} keys")
     except Exception as e:
-        logger.error(f"Failed to log keystrokes batch: {e}")
+        get_logger().error(f"Failed to log keystrokes batch: {e}")
 
 def log_idle(duration: float) -> None:
     """Log an idle event (user inactivity)."""
@@ -63,9 +73,9 @@ def log_idle(duration: float) -> None:
         with sqlite3.connect(db_path) as conn:
             conn.execute("INSERT INTO idle VALUES (?, ?)", (datetime.now().isoformat(), duration))
             conn.commit()
-        logger.info(f"Idle event logged: {duration:.0f}s")
+        get_logger().info(f"Idle event logged: {duration:.0f}s")
     except Exception as e:
-        logger.error(f"Failed to log idle: {e}")
+        get_logger().error(f"Failed to log idle: {e}")
 
 # Initialize the database
 init_db()

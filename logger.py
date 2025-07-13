@@ -6,24 +6,32 @@ from datetime import datetime
 LOG_DIR = os.path.join(os.path.dirname(__file__), 'logs')
 os.makedirs(LOG_DIR, exist_ok=True)
 
-# Create timestamped log file name
-LOG_TIME = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-LOG_FILE = os.path.join(LOG_DIR, f"{LOG_TIME}.log")
+# Global logger instance
+_log_file = None  # Will be set on first init_logger()
+_loggers = {}     # Cache of loggers to avoid duplicates
 
-def getLogger(name: str, is_main: bool = False) -> logging.Logger:
-    """Get a configured logger instance."""
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # Capture all levels, filter in handlers
-    logger.propagate = False  # Avoid duplicate logs
+def init_logger(name: str, is_main: bool = False) -> logging.Logger:
+    """Initialize and return a logger instance with file and console handlers."""
+    if name in _loggers:
+        return _loggers[name]
 
-    if not logger.handlers:
+    log = logging.getLogger(name)
+    log.setLevel(logging.DEBUG)  # Capture all levels, filter in handlers
+    log.propagate = False  # Avoid duplicate logs
+
+    if not log.handlers:
         # File handler
-        file_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
+        global _log_file
+        if _log_file is None:
+            log_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            _log_file = os.path.join(LOG_DIR, f"{log_time}.log")
+
+        file_handler = logging.FileHandler(_log_file, encoding='utf-8')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter(
             "%(asctime)-24s %(name)-10s %(levelname)-8s %(message)s"
         ))
-        logger.addHandler(file_handler)
+        log.addHandler(file_handler)
 
         # Stream (console) handler
         stream_handler = logging.StreamHandler()
@@ -31,6 +39,7 @@ def getLogger(name: str, is_main: bool = False) -> logging.Logger:
         stream_handler.setFormatter(logging.Formatter(
             "%(name)s - %(levelname)s - %(message)s"
         ))
-        logger.addHandler(stream_handler)
+        log.addHandler(stream_handler)
 
-    return logger
+    _loggers[name] = log
+    return log

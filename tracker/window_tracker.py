@@ -7,11 +7,17 @@ import time
 import win32gui
 import win32process
 import psutil
-import logger
 from storage.db import log_activity
 
 # Initialize logger for window tracking
-logger = logger.getLogger("WINDOW")
+main_logger = None
+def get_logger():
+    """Get the main logger instance, initializing it if necessary."""
+    global main_logger
+    if main_logger is None:
+        from logger import init_logger
+        main_logger = init_logger("WINDOW")
+    return main_logger
 
 def get_active_window() -> tuple[str, str]:
     """Return the current active window's process name and title."""
@@ -37,6 +43,6 @@ def track_windows() -> None:
             if last_window:
                 duration = end_time - start_time
                 log_activity(last_window[0], last_window[1], duration)
-                logger.info(f"Window switched: {last_window[0]} - {last_window[1]} | Duration: {duration:.2f}s")
+                get_logger().info(f"Window switched: {last_window[0]} - {last_window[1]} | Duration: {duration:.2f}s")
             start_time = end_time
             last_window = current_window

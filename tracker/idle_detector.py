@@ -4,15 +4,21 @@ Logs user inactivity and triggers events based on idle time.
 """
 
 import time
-import logger
 from pynput import keyboard, mouse
 from storage.db import log_idle
 
-# Initialize logger for idle detection
-logger = logger.getLogger("IDLE")
-
 # Global variable to track last input time
 last_input_time = time.time()
+
+# Initialize logger for idle detection
+main_logger = None
+def get_logger():
+    """Get the main logger instance, initializing it if necessary."""
+    global main_logger
+    if main_logger is None:
+        from logger import init_logger
+        main_logger = init_logger("IDLE")
+    return main_logger
 
 def on_input(_: object) -> None:
     """Reset the last input time on any keyboard or mouse event."""
@@ -23,6 +29,7 @@ def start_listeners() -> None:
     """Start listeners for keyboard and mouse input."""
     keyboard.Listener(on_press=on_input).start()
     mouse.Listener(on_click=on_input).start()
+    get_logger().info("Input listeners started for keyboard and mouse.")
 
 def idle_watcher() -> None:
     """Monitor for user inactivity and log idle events."""
@@ -33,4 +40,4 @@ def idle_watcher() -> None:
         if idle_duration > 300:
             log_idle(idle_duration)
             last_input_time = time.time()
-            logger.info(f"User idle for {int(idle_duration)} seconds, logged idle activity.")
+            get_logger().info(f"User idle for {int(idle_duration)} seconds, logged idle activity.")
