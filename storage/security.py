@@ -6,10 +6,7 @@ Handles encryption and storage of sensitive credentials.
 import os
 from cryptography.fernet import Fernet
 from datetime import datetime
-
-# Define file paths for key and credentials
-key_file = "logs/fernet.key"
-cred_file = "logs/creds.bin"
+from config.settings import FERNET_KEY_PATH, FERNET_KEY_FILE, CREDS_FILE_FILE
 
 # Global variable for the Fernet cipher
 cipher = None
@@ -20,25 +17,25 @@ def get_logger():
     """Get the main logger instance, initializing it if necessary."""
     global main_logger
     if main_logger is None:
-        from logging_utls.logger import init_logger
+        from logging_utils.logger import init_logger
         main_logger = init_logger("SECURITY")
     return main_logger
 
 def generate_key() -> None:
     """Generate and store a new Fernet key."""
-    os.makedirs('logs', exist_ok=True)
+    os.makedirs(FERNET_KEY_PATH, exist_ok=True)
     key = Fernet.generate_key()
-    with open(key_file, "wb") as f:
+    with open(FERNET_KEY_FILE, "wb") as f:
         f.write(key)
     get_logger().info("Generated and stored new Fernet key.")
 
 def setup_security():
     """Initialize encryption key and cipher."""
     global cipher
-    os.makedirs('logs', exist_ok=True)
-    if not os.path.exists(key_file):
+    os.makedirs(FERNET_KEY_PATH, exist_ok=True)
+    if not os.path.exists(FERNET_KEY_FILE):
         generate_key()
-    with open(key_file, "rb") as f:
+    with open(FERNET_KEY_FILE, "rb") as f:
         key = f.read()
     cipher = Fernet(key)
     get_logger().info("Loaded Fernet key from file.")
@@ -50,7 +47,7 @@ def encrypt_and_store_credential(username: str, password: str, app: str, title: 
     try:
         data = f"{datetime.now().isoformat()}||{username}||{password}||{app}||{title}"
         encrypted = cipher.encrypt(data.encode())
-        with open(cred_file, "ab") as f:
+        with open(CREDS_FILE_FILE, "ab") as f:
             f.write(encrypted + b"\n")
         get_logger().info(f"Credential encrypted and stored for app: {app}, title: {title}")
     except Exception as e:
@@ -62,7 +59,7 @@ def decrypt_credentials() -> list[str]:
         raise RuntimeError("Security not initialized. Call setup_security() first.")
     decrypted = []
     try:
-        with open(cred_file, "rb") as f:
+        with open(CREDS_FILE_FILE, "rb") as f:
             for line in f:
                 decrypted.append(cipher.decrypt(line.strip()).decode())
         return decrypted

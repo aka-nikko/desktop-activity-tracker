@@ -10,10 +10,10 @@ import time
 from datetime import datetime
 from pynput import keyboard as pynput_keyboard
 from dotenv import load_dotenv
+from config.settings import LOG_DIR, DB_FILE, SUMMARY_TRIGGER, SUMMARY_HOUR, SUMMARY_MINUTE, GPT_MODEL
 
 # Load environment variables
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Initialize logger for summarization
 main_logger = None
@@ -21,7 +21,7 @@ def get_logger():
     """Get the main logger instance, initializing it if necessary."""
     global main_logger
     if main_logger is None:
-        from logging_utls.logger import init_logger
+        from logging_utils.logger import init_logger
         main_logger = init_logger("SUMMARY")
     return main_logger
 
@@ -35,7 +35,7 @@ def listen_for_summary_trigger() -> None:
     get_logger().info("Press Ctrl+Shift+S anytime to generate summary.")
 
     hotkey = pynput_keyboard.HotKey(
-        pynput_keyboard.HotKey.parse('<ctrl>+<shift>+s'),
+        pynput_keyboard.HotKey.parse(SUMMARY_TRIGGER),
         lambda: _summary_hotkey_callback()
     )
 
@@ -49,20 +49,20 @@ def listen_for_summary_trigger() -> None:
         l.join()
 
 def schedule_nightly_summary() -> None:
-    """Automatically generate summary at 23:59 each day."""
+    """Automatically generate summary each day."""
     while True:
         now = time.localtime()
-        if now.tm_hour == 23 and now.tm_min == 59:
-            get_logger().info("Generating nightly summary at 23:59.")
+        if now.tm_hour == SUMMARY_HOUR and now.tm_min == SUMMARY_MINUTE:
+            get_logger().info(f"Generating nightly summary at {SUMMARY_HOUR}:{SUMMARY_MINUTE}.")
             summarize_day()
             time.sleep(60)
         time.sleep(10)
 
 def summarize_day() -> None:
     """Generate and log a daily summary of user activity using OpenAI GPT."""
-    db_path = "logs/activityDatabase.db"
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     try:
-        with sqlite3.connect(db_path) as conn:
+        with sqlite3.connect(DB_FILE) as conn:
             c = conn.cursor()
             c.execute("SELECT * FROM activity WHERE timestamp >= date('now')")
             activities = c.fetchall()
@@ -91,15 +91,15 @@ def summarize_day() -> None:
             get_logger().error("OPENAI_API_KEY not set. Please set it in your environment or .env file.")
             return
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=GPT_MODEL,
             messages=[{"role": "system", "content": prompt}]
         )
         summary = response.choices[0].message.content
         get_logger().info(f"--- Daily Summary ---\n{summary}")
 
         # Save summary to file
-        os.makedirs("logs", exist_ok=True)
-        with open(f"logs/summary_{datetime.now().date()}.txt", "w", encoding="utf-8") as f:
+        os.makedirs(LOG_DIR, exist_ok=True)
+        with open(f"{LOG_DIR}/summary_{datetime.now().date()}.txt", "w", encoding="utf-8") as f:
             f.write(summary)
         get_logger().info("Summary saved to file.")
 

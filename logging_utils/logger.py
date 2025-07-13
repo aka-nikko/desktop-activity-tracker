@@ -1,10 +1,7 @@
 import os
 import logging
 from datetime import datetime
-
-# Create logs directory if it doesn't exist
-LOG_DIR = 'logs'
-os.makedirs(LOG_DIR, exist_ok=True)
+from config.settings import LOG_DIR
 
 # Global logger instance
 _log_file = None  # Will be set on first init_logger()
@@ -17,9 +14,12 @@ def init_logger(name: str, is_main: bool = False) -> logging.Logger:
 
     log = logging.getLogger(name)
     log.setLevel(logging.DEBUG)  # Capture all levels, filter in handlers
-    log.propagate = False  # Avoid duplicate logs
+    log.propagate = False        # Avoid duplicate logs
 
     if not log.handlers:
+        # Create logs directory if it doesn't exist
+        os.makedirs(LOG_DIR, exist_ok=True)
+
         # File handler
         global _log_file
         if _log_file is None:
