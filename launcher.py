@@ -10,6 +10,8 @@ import subprocess
 from pathlib import Path
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
+import tkinter as tk
+from tkinter import messagebox
 from main import run_tracker
 from config.load_config import resource_path, config_path, env_path
 
@@ -34,6 +36,24 @@ class TrayApp:
 
         # Initialize system tray icon
         self.icon = self._create_icon()
+
+    def show_dialog(self, title: str, message: str, dialog_type: str = "info") -> None:
+        """Show a dialog box with the specified title and message."""
+        def _show():
+            root = tk.Tk()
+            root.withdraw()
+            dlg_map = {
+                "info": messagebox.showinfo,
+                "warning": messagebox.showwarning,
+                "error": messagebox.showerror,
+                "question": messagebox.askquestion
+            }
+            func = dlg_map.get(dialog_type.lower(), messagebox.showinfo)
+            func(title, message)
+            root.quit()
+            root.destroy()
+
+        threading.Thread(target=_show).start()
 
     def _create_icon(self):
         """Set up the tray icon and its menu."""
@@ -63,6 +83,10 @@ class TrayApp:
             )
             self.tracker_process.start()
             get_logger().info("Tracking started.")
+            self.show_dialog("Tracking Started", "Activity Tracker is now running.")
+        else:
+            get_logger().warning("Tracker is already running.")
+            self.show_dialog("Already Running", "Activity Tracker is already in progress.", "warning")
 
     def stop_tracking(self, icon, item) -> None:
         """Stop the tracker process if it is running."""
@@ -71,12 +95,17 @@ class TrayApp:
             self.tracker_process.join()
             self.tracker_process = None
             get_logger().info("Tracking stopped.")
+            self.show_dialog("Tracking Stopped", "Activity Tracker has been stopped.")
+        else:
+            get_logger().warning("Tracker is not running.")
+            self.show_dialog("Not Running", "Activity Tracker is not currently running.", "warning")
 
     def summarize(self, icon, item) -> None:
         """Send a command to the tracker process to summarize the day."""
         if self.tracker_process and self.tracker_process.is_alive():
             self.cmd_queue.put("summarize")
             get_logger().info("Sent 'summarize' command.")
+            self.show_dialog("Summarize Command Sent", "The tracker will summarize the day's activity.")
 
     def open_file(self, path: Path) -> None:
         """Open a file with the default system editor."""
@@ -100,15 +129,22 @@ class TrayApp:
 
     def quit_app(self, icon, item) -> None:
         """Quit the application and stop the tracker if running."""
-        self.stop_tracking(icon, item)
+        # Silently stop tracking without dialogs
+        if self.tracker_process and self.tracker_process.is_alive():
+            self.tracker_process.terminate()
+            self.tracker_process.join()
+            self.tracker_process = None
+            get_logger().info("Tracking stopped (via exit).")
         icon.stop()
         get_logger().info("Application exited.")
+        self.show_dialog("Exiting", "Desktop Activity Tracker is exiting.")
 
     def run(self) -> threading.Thread:
         """Start the tray icon in a background thread."""
         tray_thread = threading.Thread(target=self.icon.run)
         tray_thread.start()
         get_logger().info("Tray icon is running...")
+        self.show_dialog("Tray Started", "Desktop Activity Tracker is running in the system tray.")
         return tray_thread
 
 if __name__ == "__main__":
