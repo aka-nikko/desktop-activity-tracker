@@ -1,0 +1,20 @@
+{
+    "LOG_DIR": "logs",
+    "DB_PATH": "logs",
+    "DB_FILE": "activityDatabase.db",
+
+    "FERNET_KEY_PATH": "assets",
+    "CREDS_FILE_PATH": "assets",
+
+    "SENSITIVE_KEYWORDS": ["login", "sign in", "password", "auth"],
+
+    "BATCH_SIZE": 20,
+    "FLUSH_INTERVAL": 1.0,
+
+    "SUMMARY_TRIGGER": "<ctrl>+<shift>+s",
+
+    "SUMMARY_HOUR": 23,
+    "SUMMARY_MINUTE": 59,
+
+    "GPT_MODEL": "gpt-3.5-turbo"
+}

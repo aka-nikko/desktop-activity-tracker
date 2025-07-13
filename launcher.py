@@ -11,6 +11,7 @@ from pathlib import Path
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
 from main import run_tracker
+from config.load_config import resource_path, config_path, env_path
 
 # Initialize logger
 main_logger = None
@@ -26,14 +27,10 @@ class TrayApp:
     """
     TrayApp encapsulates all system tray functionality and manages the tracker process.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         # Queue for inter-process communication with the tracker
         self.cmd_queue = multiprocessing.Queue()
         self.tracker_process = None
-
-        # Paths for configuration files
-        self.env_path = Path(".env").resolve()
-        self.config_path = Path("config/settings.py").resolve()
 
         # Initialize system tray icon
         self.icon = self._create_icon()
@@ -42,23 +39,23 @@ class TrayApp:
         """Set up the tray icon and its menu."""
         icon = Icon("ActivityTracker")
         try:
-            icon.icon = Image.open("assets/icon.ico")
+            icon.icon = Image.open(resource_path("assets/icon.ico"))
         except Exception as e:
             get_logger().error(f"Failed to load tray icon: {e}")
-            icon.icon = None  # Fallback to default icon
+            icon.icon = None
 
         icon.menu = Menu(
             MenuItem("Start Tracking", self.start_tracking),
             MenuItem("Stop Tracking", self.stop_tracking),
             MenuItem("Summarize", self.summarize),
-            MenuItem("Edit .env", self.open_env),
-            MenuItem("Edit Settings", self.open_config),
+            MenuItem("OpenAI API Key", self.open_env),
+            MenuItem("Settings", self.open_config),
             MenuItem("Exit", self.quit_app)
         )
         icon.title = "Desktop Activity Tracker"
         return icon
 
-    def start_tracking(self, icon, item):
+    def start_tracking(self, icon, item) -> None:
         """Start the tracker process if not already running."""
         if self.tracker_process is None or not self.tracker_process.is_alive():
             self.tracker_process = multiprocessing.Process(
@@ -67,7 +64,7 @@ class TrayApp:
             self.tracker_process.start()
             get_logger().info("Tracking started.")
 
-    def stop_tracking(self, icon, item):
+    def stop_tracking(self, icon, item) -> None:
         """Stop the tracker process if it is running."""
         if self.tracker_process and self.tracker_process.is_alive():
             self.tracker_process.terminate()
@@ -75,13 +72,13 @@ class TrayApp:
             self.tracker_process = None
             get_logger().info("Tracking stopped.")
 
-    def summarize(self, icon, item):
+    def summarize(self, icon, item) -> None:
         """Send a command to the tracker process to summarize the day."""
         if self.tracker_process and self.tracker_process.is_alive():
             self.cmd_queue.put("summarize")
             get_logger().info("Sent 'summarize' command.")
 
-    def open_file(self, path: Path):
+    def open_file(self, path: Path) -> None:
         """Open a file with the default system editor."""
         try:
             if os.name == "nt":  # Windows
@@ -93,27 +90,26 @@ class TrayApp:
         except Exception as e:
             get_logger().error(f"Could not open file: {e}")
 
-    def open_env(self, icon, item):
+    def open_env(self, icon, item) -> None:
         """Open the .env file for editing."""
-        self.open_file(self.env_path)
+        self.open_file(env_path)
 
-    def open_config(self, icon, item):
+    def open_config(self, icon, item) -> None:
         """Open the settings configuration file."""
-        self.open_file(self.config_path)
+        self.open_file(config_path)
 
-    def quit_app(self, icon, item):
+    def quit_app(self, icon, item) -> None:
         """Quit the application and stop the tracker if running."""
         self.stop_tracking(icon, item)
         icon.stop()
         get_logger().info("Application exited.")
 
-    def run(self):
+    def run(self) -> threading.Thread:
         """Start the tray icon in a background thread."""
         tray_thread = threading.Thread(target=self.icon.run)
         tray_thread.start()
         get_logger().info("Tray icon is running...")
         return tray_thread
-
 
 if __name__ == "__main__":
     # Required for Windows to prevent multiprocessing issues on script re-import

@@ -1,7 +1,7 @@
 import os
 import logging
 from datetime import datetime
-from config.settings import LOG_DIR
+from config.load_config import config_data
 
 # Global logger instance
 _log_file = None  # Will be set on first init_logger()
@@ -18,13 +18,13 @@ def init_logger(name: str, is_main: bool = False) -> logging.Logger:
 
     if not log.handlers:
         # Create logs directory if it doesn't exist
-        os.makedirs(LOG_DIR, exist_ok=True)
+        os.makedirs(config_data["LOG_DIR"], exist_ok=True)
 
         # File handler
         global _log_file
         if _log_file is None:
             log_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            _log_file = os.path.join(LOG_DIR, f"{log_time}.log")
+            _log_file = os.path.join(config_data["LOG_DIR"], f"{log_time}.log")
 
         if name != "TRAY":
             file_handler = logging.FileHandler(_log_file, encoding='utf-8')

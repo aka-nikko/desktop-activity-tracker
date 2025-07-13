@@ -6,7 +6,7 @@ Handles encryption and storage of sensitive credentials.
 import os
 from cryptography.fernet import Fernet
 from datetime import datetime
-from config.settings import FERNET_KEY_PATH, FERNET_KEY_FILE, CREDS_FILE_FILE
+from config.load_config import config_data
 
 # Global variable for the Fernet cipher
 cipher = None
@@ -23,19 +23,19 @@ def get_logger():
 
 def generate_key() -> None:
     """Generate and store a new Fernet key."""
-    os.makedirs(FERNET_KEY_PATH, exist_ok=True)
+    os.makedirs(config_data["FERNET_KEY_PATH"], exist_ok=True)
     key = Fernet.generate_key()
-    with open(FERNET_KEY_FILE, "wb") as f:
+    with open(f"{config_data["FERNET_KEY_PATH"]}/fernet.key", "wb") as f:
         f.write(key)
     get_logger().info("Generated and stored new Fernet key.")
 
-def setup_security():
+def setup_security() -> None:
     """Initialize encryption key and cipher."""
     global cipher
-    os.makedirs(FERNET_KEY_PATH, exist_ok=True)
-    if not os.path.exists(FERNET_KEY_FILE):
+    os.makedirs(config_data["FERNET_KEY_PATH"], exist_ok=True)
+    if not os.path.exists(f"{config_data["FERNET_KEY_PATH"]}/fernet.key"):
         generate_key()
-    with open(FERNET_KEY_FILE, "rb") as f:
+    with open(f"{config_data["FERNET_KEY_PATH"]}/fernet.key", "rb") as f:
         key = f.read()
     cipher = Fernet(key)
     get_logger().info("Loaded Fernet key from file.")
@@ -47,7 +47,7 @@ def encrypt_and_store_credential(username: str, password: str, app: str, title: 
     try:
         data = f"{datetime.now().isoformat()}||{username}||{password}||{app}||{title}"
         encrypted = cipher.encrypt(data.encode())
-        with open(CREDS_FILE_FILE, "ab") as f:
+        with open(f"{config_data["DB_PATH"]}/creds.bin", "ab") as f:
             f.write(encrypted + b"\n")
         get_logger().info(f"Credential encrypted and stored for app: {app}, title: {title}")
     except Exception as e:
@@ -59,7 +59,7 @@ def decrypt_credentials() -> list[str]:
         raise RuntimeError("Security not initialized. Call setup_security() first.")
     decrypted = []
     try:
-        with open(CREDS_FILE_FILE, "rb") as f:
+        with open(f"{config_data["DB_PATH"]}/creds.bin", "rb") as f:
             for line in f:
                 decrypted.append(cipher.decrypt(line.strip()).decode())
         return decrypted

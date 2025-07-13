@@ -23,7 +23,7 @@ def get_logger():
         main_logger = init_logger("MAIN", is_main=True)
     return main_logger
 
-def run_tracker(cmd_queue=None):
+def run_tracker(cmd_queue=None) -> None:
     """Run the tracker logic, initializing all components and starting background threads."""
     get_logger().info("Desktop Activity Tracker starting...")
 
