@@ -75,6 +75,3 @@ def log_idle(duration: float) -> None:
         get_logger().info(f"Idle event logged: {duration:.0f}s")
     except Exception as e:
         get_logger().error(f"Failed to log idle: {e}")
-
-# Initialize the database
-init_db()

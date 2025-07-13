@@ -12,11 +12,13 @@ httpx==0.28.1
 idna==3.10
 jiter==0.10.0
 openai==1.95.1
+pillow==11.3.0
 psutil==7.0.0
 pycparser==2.22
 pydantic==2.11.7
 pydantic_core==2.33.2
 pynput==1.8.1
+pystray==0.19.5
 python-dotenv==1.1.1
 pywin32==310
 six==1.17.0

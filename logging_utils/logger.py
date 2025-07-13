@@ -26,12 +26,13 @@ def init_logger(name: str, is_main: bool = False) -> logging.Logger:
             log_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             _log_file = os.path.join(LOG_DIR, f"{log_time}.log")
 
-        file_handler = logging.FileHandler(_log_file, encoding='utf-8')
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(logging.Formatter(
-            "%(asctime)-24s %(name)-10s %(levelname)-8s %(message)s"
-        ))
-        log.addHandler(file_handler)
+        if name != "TRAY":
+            file_handler = logging.FileHandler(_log_file, encoding='utf-8')
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(logging.Formatter(
+                "%(asctime)-24s %(name)-10s %(levelname)-8s %(message)s"
+            ))
+            log.addHandler(file_handler)
 
         # Stream (console) handler
         stream_handler = logging.StreamHandler()

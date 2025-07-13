@@ -11,8 +11,9 @@ A privacy-conscious productivity tracker for Windows that logs app usage, keystr
 - **Idle Detection:** Detects and logs periods of user inactivity.
 - **Daily Summaries:** Uses OpenAI GPT to generate a summary of your day based on tracked data.
 - **Credential Security:** Encrypts and stores sensitive credentials using Fernet symmetric encryption.
-- **Hotkey Trigger:** Press `Ctrl+Shift+S` anytime to generate a summary on demand.
+- **Hotkey Trigger:** Press a defined hotkey anytime to generate a summary on demand.
 - **Nightly Automation:** Automatically generates a summary at 23:59 each day.
+- **System Tray Control:** Minimal UI with a tray icon to start/stop tracking, trigger summaries, and access config files.
 
 ---
 
@@ -52,7 +53,7 @@ A privacy-conscious productivity tracker for Windows that logs app usage, keystr
 
 ## Usage
 
-Start the tracker with:
+Start the tracker directly with:
 
 ```sh
 python main.py
@@ -62,6 +63,15 @@ python main.py
 - Press `Ctrl+Shift+S` to manually generate a summary.
 - Summaries are saved in the `logs/` directory.
 
+Or, use the system tray interface with:
+
+```sh
+python launcher.py
+```
+
+- Adds a tray icon with controls to start/stop tracking, trigger summaries, and open config files.
+- Clean, minimal UI for quick access and control.
+
 ---
 
 ## Project Structure
@@ -69,9 +79,14 @@ python main.py
 ```
 .
 ├── main.py
+├── launcher.txt
 ├── requirements.txt
 ├── .env
 ├── logs/
+├── config/
+│   └── settings.py
+├── logging_utils/
+│   └── logger.py
 ├── storage/
 │   ├── db.py
 │   └── security.py
@@ -88,7 +103,7 @@ python main.py
 ## Security & Privacy
 
 - Sensitive keystrokes (e.g., passwords) are redacted and never stored in plain text.
-- Credentials are encrypted using Fernet and stored in `logs/creds.bin`.
+- Credentials are encrypted using Fernet and stored in `assets/creds.bin`.
 - Your OpenAI API key is loaded from the `.env` file and never logged.
 
 ---
@@ -98,6 +113,8 @@ python main.py
 ![Logging](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/logging.png)
 ### Summary
 ![Summary](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/gpt-summary.png)
+### Tray UI
+![Tray_icon](https://github.com/aka-nikko/desktop-activity-tracker/blob/main/screenshots/tray_icon.png)
 
 ---
 
